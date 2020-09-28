@@ -1,5 +1,8 @@
 import sys
 import spacy
+from lib import Error
+from lib.automate import Automate
+from lib.settings import SETTINGS
 
 
 # Requirments:
@@ -41,10 +44,10 @@ def print_tokens(doc):
 
 
 def tokens_to_string(tokens):
-    string = ""
+    text = list()
     for t in tokens:
-        string = string + t.text + " "
-    return string
+        text.append(t.text)
+    return " ".join(text)
 
 
 # Get name
@@ -100,20 +103,43 @@ def run_demo(doc):
 
     if action is None:
         print("Error")
+        return
     else:
         if action.lemma_ == "email":
             (name, rest) = get_name(rest)
-            print("Email")
-            print("Sender: me,")
-            print("Reciver: {0},".format(email_contacts.get(name.lemma_)))
-            print("Message: \"{0}\",".format(tokens_to_string(rest)))
+            if name is None:
+                print("Error")
+                return
+            contact = email_contacts.get(name.text.lower())
+            automate = Automate()
+            try:
+                response = automate.run(
+                    "skicka",
+                    [contact],
+                    None,
+                    tokens_to_string(rest),
+                    "John Doe",
+                )
+                print(response)
+            except Error as err:
+                print(err)
+
         elif action.lemma_ == "alarm":
             time = get_time(doc)
+            if time is None:
+                print("Error")
+                return
             print("Alarm")
             print("Alarm set at time \"{}\".".format(time))
         elif action.lemma_ == "meeting":
             (name, rest) = get_name(rest)
+            if name is None:
+                print("Error")
+                return
             time = get_time(doc)
+            if time is None:
+                print("Error")
+                return
             print("Meeting")
             print("Meeting set with \"{0}\" at time \"{1}\".".format(name.text,
                                                                      time))

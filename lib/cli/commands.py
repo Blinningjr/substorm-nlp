@@ -9,15 +9,16 @@ sys.path.append(".")
 
 from lib import Error
 from lib.automate import Automate
+from lib.nlp import demo
 
 
 def commands(arr):
     """
     Commands supported by the CLI
     """
-    if arr[0] == "send" or arr[0] == "s":
+    if arr[0] == "input" or arr[0] == "i":
         # TODO: send arr[1] to automation
-        print("text = ", arr[1:])
+        demo.nlp(' '.join(arr[1:]))
         arr.clear()
     elif arr[0] == "exit" or arr[0] == "e":
         sys.exit()
